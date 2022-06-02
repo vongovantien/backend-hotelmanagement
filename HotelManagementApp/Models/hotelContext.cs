@@ -19,11 +19,89 @@ namespace HotelManagementApp.Models
         {
         }
 
+        public virtual DbSet<Booking> Booking { get; set; }
+        public virtual DbSet<Customer> Customer { get; set; }
         public virtual DbSet<Room> Room { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "English_United States.1252");
+
+            modelBuilder.Entity<Booking>(entity =>
+            {
+                entity.ToTable("booking");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.BookingDate)
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("booking_date");
+
+                entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+
+                entity.Property(e => e.RoodId).HasColumnName("rood_id");
+
+                entity.HasOne(d => d.Customer)
+                    .WithMany(p => p.Booking)
+                    .HasForeignKey(d => d.CustomerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("booking_fk_1");
+
+                entity.HasOne(d => d.Rood)
+                    .WithMany(p => p.Booking)
+                    .HasForeignKey(d => d.RoodId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("booking_fk");
+            });
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.ToTable("customer");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("uuid_generate_v4()");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp(6) with time zone")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.CustomerAddress)
+                    .HasMaxLength(150)
+                    .HasColumnName("customer_address");
+
+                entity.Property(e => e.CustomerEmail)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("customer_email");
+
+                entity.Property(e => e.CustomerFirstName)
+                    .HasMaxLength(50)
+                    .HasColumnName("customer_first_name");
+
+                entity.Property(e => e.CustomerLastName)
+                    .HasMaxLength(50)
+                    .HasColumnName("customer_last_name");
+
+                entity.Property(e => e.CustomerPhone)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .HasColumnName("customer_phone");
+
+                entity.Property(e => e.CustomerTax)
+                    .HasMaxLength(20)
+                    .HasColumnName("customer_tax");
+
+                entity.Property(e => e.ModifiedAt)
+                    .HasColumnType("timestamp(6) with time zone")
+                    .HasColumnName("modified_at");
+
+                entity.Property(e => e.ModifiedBy).HasColumnName("modified_by");
+            });
 
             modelBuilder.Entity<Room>(entity =>
             {

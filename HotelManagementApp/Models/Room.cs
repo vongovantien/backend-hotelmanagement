@@ -7,8 +7,15 @@ namespace HotelManagementApp.Models
 {
     public partial class Room
     {
+        public Room()
+        {
+            Booking = new HashSet<Booking>();
+        }
+
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public virtual ICollection<Booking> Booking { get; set; }
     }
 }
